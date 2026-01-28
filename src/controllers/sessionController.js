@@ -1,20 +1,27 @@
-import Users from '../models/User.js';
-import bcrypt from 'bcrypt';
+
 import jwt from 'jsonwebtoken';
+import UserDTO from '../dto/UserDTO.js';
+import { requestPasswordReset, resetPassword } from '../services/passwordRecovery.service.js';
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
-  const user = await Users.findOne({ email });
-  if (!user) return res.status(400).json({ error: 'Usuario no encontrado' });
-
-  const valid = bcrypt.compareSync(password, user.password);
-  if (!valid) return res.status(400).json({ error: 'Contraseña incorrecta' });
-
-  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES_IN });
-
+  const token = jwt.sign(
+    { id: req.user._id, role: req.user.role },
+    process.env.JWT_SECRET,
+    { expiresIn: '1h' }
+  );
   res.json({ token });
 };
 
 export const current = async (req, res) => {
-  res.json({ user: req.user });
+  res.json(new UserDTO(req.user));
+};
+
+export const forgotPassword = async (req, res) => {
+  await requestPasswordReset(req.body.email);
+  res.json({ message: 'Mail enviado' });
+};
+
+export const changePassword = async (req, res) => {
+  await resetPassword(req.params.token, req.body.password);
+  res.json({ message: 'Contraseña actualizada' });
 };

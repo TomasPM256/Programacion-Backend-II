@@ -1,11 +1,13 @@
+
 import { Router } from 'express';
-import { login, current } from '../controllers/sessionController.js';
 import passport from 'passport';
-import '../config/passport.js';
+import { login, current, forgotPassword, changePassword } from '../controllers/sessionController.js';
 
 const router = Router();
 
-router.post('/login', login);
+router.post('/login', passport.authenticate('login', { session: false }), login);
 router.get('/current', passport.authenticate('jwt', { session: false }), current);
+router.post('/forgot-password', forgotPassword);
+router.post('/reset-password/:token', changePassword);
 
 export default router;

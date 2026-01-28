@@ -1,13 +1,11 @@
+
 import mongoose from 'mongoose';
 
-const UserSchema = new mongoose.Schema({
+export default mongoose.model('Users', new mongoose.Schema({
   first_name: String,
   last_name: String,
   email: { type: String, unique: true },
-  age: Number,
   password: String,
-  cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Carts' },
-  role: { type: String, default: 'user' }
-});
-
-export default mongoose.model('Users', UserSchema);
+  role: { type: String, default: 'user' },
+  cart: { type: mongoose.Schema.Types.ObjectId, ref: 'Carts' }
+}));
